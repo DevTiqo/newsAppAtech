@@ -1,2 +1,2 @@
 # newsAppAtech
-A news app for an interview stage
+A news app for an interview
