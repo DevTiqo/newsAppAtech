@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "928416485762",
+    "project_id": "newsapp-d82d8",
+    "storage_bucket": "newsapp-d82d8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:928416485762:android:5934fb01582a978944bf9b",
+        "android_client_info": {
+          "package_name": "com.tiqotek.newsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "928416485762-iak0b9tccn97vdaqpvio2m387rupoeij.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZgleuHJPSicQv9-sbOoBzOHDEYKUaSeo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "928416485762-iak0b9tccn97vdaqpvio2m387rupoeij.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

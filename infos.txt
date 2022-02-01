@@ -1,0 +1,35 @@
+ new.org api key 670e30e6d5194e76a4118fbadfb0e341
+
+ {
+    "status": "ok",
+    "totalResults": 12247,
+    "articles": [
+        {
+            "source": {
+                "id": null,
+                "name": "newsBTC"
+            },
+            "author": "Reynaldo Marquez",
+            "title": "Bitcoin Bears To Resume Assault? Why BTC Could Crash To $33K",
+            "description": "Bitcoin has been trading around its current levels for several days, leading to an apparent shift in sentiment across the crypto market. As BTC’s price trend to the upside after the U.S. Federal Reserve FOMC meeting, there seems to be an increase in optimisti…",
+            "url": "https://www.newsbtc.com/news/bitcoin/bitcoin-bears-to-resume-assault-why-btc-could-crash-to-33k/",
+            "urlToImage": "https://www.newsbtc.com/wp-content/uploads/2021/11/Bitcoin-BTC-BTCUSD-3.jpg",
+            "publishedAt": "2022-01-31T18:00:49Z",
+            "content": "Bitcoin has been trading around its current levels for several days, leading to an apparent shift in sentiment across the crypto market. As BTCs price trend to the upside after the U.S. Federal Reser… [+3041 chars]"
+        }, 
+        {
+            "source": {
+                "id": null,
+                "name": "Bitcoinist"
+            },
+            "author": "Reynaldo Marquez",
+            "title": "Bitcoin Has Become A Top Retirement Investment Option, Survey Shows",
+            "description": "Per a survey conducted by investment firm Capitalize, Bitcoin and cryptocurrencies have been gaining relevance as retirement investment options. Digital assets, once synonyms with speculation, and gambling, have acquired prestige as one of the best ways to se…",
+            "url": "https://bitcoinist.com/bitcoin-become-retirement-investment-survey-shows/",
+            "urlToImage": "https://bitcoinist.com/wp-content/uploads/2022/01/bitcoin-genesis-block-iStock-1145592969.jpeg",
+            "publishedAt": "2022-01-31T18:00:08Z",
+            "content": "Per a survey conducted by investment firm Capitalize, Bitcoin and cryptocurrencies have been gaining relevance as retirement investment options. Digital assets, once synonyms with speculation, and ga… [+3269 chars]"
+        },
+    ]
+
+ }
