@@ -1,35 +1,59 @@
 import 'dart:convert';
 
 class News {
-  int id;
+  int? id;
 
   String name;
 
-  int price;
+  String author;
 
-  int available;
+  String title;
 
-  String category;
-
-  String photo;
+  String description;
+  String url;
+  String urlToImage;
+  DateTime publishedAt;
+  String content;
 
   News({
-    required this.id,
+    this.id = 0,
     required this.name,
-    required this.price,
-    required this.available,
-    this.category = "",
-    this.photo = "",
+    required this.author,
+    required this.title,
+    required this.description,
+    required this.url,
+    required this.urlToImage,
+    required this.publishedAt,
+    required this.content,
   });
 
   factory News.fromMap(Map<String, dynamic> map) {
     return News(
       id: map['id'],
+      name: map['source']['name'],
+      author: map['author'],
+      title: map['title'],
+      description: map['description'],
+      url: map['url'],
+      urlToImage: map['urlToImage'],
+      publishedAt:
+          DateTime.parse(map['publishedAt'] ?? DateTime.now().toString()),
+      content: map['content'],
+    );
+  }
+
+  factory News.fromFirebase(Map<String, dynamic> map) {
+    return News(
+      id: map['id'],
       name: map['name'],
-      price: map['price'],
-      category: map['category'] ?? '',
-      available: map['available'],
-      photo: map['photo'] ?? '',
+      author: map['author'],
+      title: map['title'],
+      description: map['description'],
+      url: map['url'],
+      urlToImage: map['urlToImage'],
+      publishedAt:
+          DateTime.parse(map['publishedAt'] ?? DateTime.now().toString()),
+      content: map['content'],
     );
   }
 }

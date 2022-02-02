@@ -18,7 +18,6 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   final formKey = GlobalKey<FormState>();
   bool hidePassword = true;
-  late AuthNotifier authNotifier;
   String fullname = "";
   String email = "";
   String password = "";
@@ -53,8 +52,8 @@ class _SignUpState extends State<SignUp> {
         });
         // Navigator.pushNamedAndRemoveUntil(
         //   context,
-        //   "/checkout",
-        //   ModalRoute.withName('/applayout'),
+        //   "/applayout",
+        //   (route) => false,
         // );
         // Navigator.pushReplacementNamed(context, ('/checkout'));
       } else {
@@ -207,7 +206,7 @@ class _SignUpState extends State<SignUp> {
                         hintStyle: TextStyle(
                           fontSize: 14,
                           fontFamily: 'Nunito',
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                           fontStyle: FontStyle.normal,
                           color: Color(0xff8D9091),
                         ),
@@ -274,7 +273,7 @@ class _SignUpState extends State<SignUp> {
                         hintStyle: TextStyle(
                           fontSize: 14,
                           fontFamily: 'Nunito',
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                           fontStyle: FontStyle.normal,
                           color: Color(0xff8D9091),
                         ),
@@ -343,7 +342,7 @@ class _SignUpState extends State<SignUp> {
                         hintStyle: TextStyle(
                           fontSize: 14,
                           fontFamily: 'Nunito',
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                           fontStyle: FontStyle.normal,
                           color: Color(0xff8D9091),
                         ),
@@ -547,7 +546,7 @@ class _SignUpState extends State<SignUp> {
                                 fontSize: 16,
                                 color: Color(0xff8D9091),
                                 fontFamily: 'Nunito',
-                                fontWeight: FontWeight.w400,
+                                fontWeight: FontWeight.w500,
                                 fontStyle: FontStyle.normal),
                           ),
                           SizedBox(height: 5),
@@ -561,7 +560,7 @@ class _SignUpState extends State<SignUp> {
                                   fontSize: 16,
                                   color: primaryColor,
                                   fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w500,
                                   fontStyle: FontStyle.normal),
                             ),
                           )

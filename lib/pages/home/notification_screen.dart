@@ -39,7 +39,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     fontFamily: 'Nunito',
                     fontSize: 12,
                     color: primaryColor,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -60,12 +60,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   children: [
                     const SizedBox(height: 16),
                     const Text(
-                        'Hi Jackson, what would you like to order today?',
+                        'Hi Jackson, what news would you like to read today?',
                         style: TextStyle(
                           fontFamily: 'Nunito',
                           fontSize: 14,
                           color: Colors.black,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         )),
                     const SizedBox(height: 16),
                     Text('2m ago',
@@ -73,7 +73,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           fontFamily: 'Nunito',
                           fontSize: 12,
                           color: supportingText,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         )),
                     const SizedBox(height: 16),
                     const Divider()
@@ -87,12 +87,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   children: [
                     const SizedBox(height: 16),
                     const Text(
-                        'Hi Jackson, what would you like to order today?',
+                        'Hi Jackson, what news would you like to read today?',
                         style: TextStyle(
                           fontFamily: 'Nunito',
                           fontSize: 14,
                           color: Colors.black,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         )),
                     const SizedBox(height: 16),
                     Text('2m ago',
@@ -100,7 +100,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           fontFamily: 'Nunito',
                           fontSize: 12,
                           color: supportingText,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         )),
                     const SizedBox(height: 16),
                     const Divider()
@@ -114,12 +114,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   children: [
                     const SizedBox(height: 16),
                     const Text(
-                        'Hi Jackson, what would you like to order today?',
+                        'Hi Jackson, what news would you like to read today?',
                         style: TextStyle(
                           fontFamily: 'Nunito',
                           fontSize: 14,
                           color: Colors.black,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         )),
                     const SizedBox(height: 16),
                     Text('2m ago',
@@ -127,7 +127,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           fontFamily: 'Nunito',
                           fontSize: 12,
                           color: supportingText,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         )),
                     const SizedBox(height: 16),
                     const Divider()
@@ -141,12 +141,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   children: [
                     const SizedBox(height: 16),
                     const Text(
-                        'Hi Jackson, what would you like to order today?',
+                        'Hi Jackson, what news would you like to read today?',
                         style: TextStyle(
                           fontFamily: 'Nunito',
                           fontSize: 14,
                           color: Colors.black,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         )),
                     const SizedBox(height: 16),
                     Text('2m ago',
@@ -154,7 +154,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           fontFamily: 'Nunito',
                           fontSize: 12,
                           color: supportingText,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         )),
                     const SizedBox(height: 16),
                     const Divider()
@@ -168,12 +168,12 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   children: [
                     const SizedBox(height: 16),
                     const Text(
-                        'Hi Jackson, what would you like to order today?',
+                        'Hi Jackson, what news would you like to read today?',
                         style: TextStyle(
                           fontFamily: 'Nunito',
                           fontSize: 14,
                           color: Colors.black,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         )),
                     const SizedBox(height: 16),
                     Text('2m ago',
@@ -181,7 +181,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           fontFamily: 'Nunito',
                           fontSize: 12,
                           color: supportingText,
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                         )),
                     const SizedBox(height: 16),
                     const Divider()

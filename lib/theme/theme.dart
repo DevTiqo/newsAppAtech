@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // All of our constant stuff
 
-Color primaryColor = const Color(0xFF0000FF);
+Color primaryColor = const Color(0xFF0084ff);
 Color primaryLight = const Color(0xFFE5CDCD);
 Color backgroundColor = const Color(0xFFF9F9F9);
 
@@ -35,7 +35,7 @@ ThemeData light = ThemeData(
   primaryColor: primaryColor,
   primaryColorDark: primaryColor,
   primarySwatch: const MaterialColor(
-    0xFF7B0304,
+    0xFF0084ff,
     <int, Color>{
       50: Color(0xFF000000),
       100: Color(0xFF000000),

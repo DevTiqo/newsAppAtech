@@ -1,25 +1,32 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:newsapp/models/news.dart';
 import 'package:flutter/material.dart';
+import 'package:newsapp/services/api.dart';
 
-class NewsNotifier extends ChangeNotifier {
-  List<List<News>> Newss = [];
+class NewsState extends StateNotifier<List<News>> {
+  NewsState() : super([]);
 
-  // List<List<Map<String, List<News>>>>
+  static final provider = StateNotifierProvider<NewsState, List<News>>((ref) {
+    return NewsState();
+  });
 
-  List<List<News>> get Newsslist => Newss;
-
-  set Newsslist(List<List<News>> Newslist) {
-    Newss = Newslist;
-    notifyListeners();
-  }
-
-  void clearNewss() {
-    Newss = [];
-    notifyListeners();
-  }
-
-  void clearExtras() {
-    Newss = [];
-    notifyListeners();
+  void setNews(List<News> news) {
+    state = news;
   }
 }
+
+final newsList = FutureProvider<List<News>>((ref) async {
+  return await getNewsFromFirebase();
+});
+
+final searchFilterProvider = StateProvider<String>((_) => '');
+
+final filteredNews = Provider<List<News>>((ref) {
+  final news = ref.watch(newsList) as List<News>;
+  final search = ref.watch(searchFilterProvider); // 1
+
+  var filteredNewsList =
+      news.where((newz) => newz.title.toLowerCase().contains(search)); // 2
+
+  return filteredNewsList.toList(); // 4
+});

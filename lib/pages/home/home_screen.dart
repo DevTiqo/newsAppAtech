@@ -1,6 +1,9 @@
+import 'package:extended_image/extended_image.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:newsapp/models/news.dart';
 import 'package:newsapp/notifiers/auth_notifier.dart';
 import 'package:newsapp/notifiers/news_notifier.dart';
+import 'package:newsapp/pages/home/news_detail.dart';
 import 'package:newsapp/pages/home/search_page.dart';
 import 'package:newsapp/services/api.dart';
 import 'package:newsapp/services/http.dart';
@@ -10,17 +13,15 @@ import 'package:riverpod/riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:unicons/unicons.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin {
-  late int day;
-
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   final String assetName = 'assets/images/cart.svg';
@@ -31,31 +32,25 @@ class _HomeScreenState extends State<HomeScreen>
 
   ScrollController _controller = new ScrollController(keepScrollOffset: true);
 
+  late List<News> news;
+
   @override
   void initState() {
-    day = DateTime.now().weekday;
-    print("Day : $day");
-    // Adjust by subtracting 1 to compensate for Sunday
-    day -= 1;
-
-    // When day does not exist in the tabs
-    if (day > lengthTab - 1) day = 0;
-
-    // Change to a Monday if day is Sunday
-    if (day < 0) day = 0;
-
-    tabController = TabController(
-      length: lengthTab,
-      vsync: this,
-    );
-
-    tabController.index = day;
     super.initState();
-
-    super.initState();
+    myfuture = call();
     salutation = greeting();
     WidgetsBinding.instance
         ?.addPostFrameCallback((_) => print('Called After finished'));
+  }
+
+  Future<List<News>> call() async {
+    List<News> gotten = await getNewsFromFirebase();
+
+    setState(() {
+      news = gotten;
+    });
+
+    return gotten;
   }
 
   String greeting() {
@@ -96,80 +91,67 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.white,
+      backgroundColor: backgroundColor,
       //App Bar Data
-      appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.black),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        titleSpacing: 23,
-        title: Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 10.0,
-              ),
-              Text(
-                "Hi,  GUEST",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'Integral',
-                    color: textColor,
-                    fontWeight: FontWeight.w400,
-                    fontStyle: FontStyle.normal),
-              ),
-              SizedBox(
-                height: 2.0,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    salutation,
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'Nunito',
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontStyle: FontStyle.normal),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80.0), // here the desired height
+        child: AppBar(
+          iconTheme: const IconThemeData(color: Colors.black),
+          backgroundColor: backgroundColor,
+          elevation: 0,
+          titleSpacing: 23,
+          flexibleSpace: Padding(
+            padding: const EdgeInsets.only(top: 45.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 10,
+                ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.asset(
+                    'assets/images/user.png',
+                    height: 60,
                   ),
-                  Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Icon(UniconsSolid.airplay)),
-                ],
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          InkWell(
-              onTap: () {
-                Navigator.pushNamed(context, '/cart');
-              },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Stack(
-                  alignment: Alignment.center,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 36,
-                      height: 36,
-                      decoration: const BoxDecoration(
-                        color: Color(0xffF9F9F9),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Icon(UniconsSolid.airplay),
-                      ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Text(
+                      "Welcome Back",
+                      style: TextStyle(
+                          fontSize: 19,
+                          fontFamily: 'Nunito',
+                          color: textColor,
+                          fontWeight: FontWeight.w800,
+                          fontStyle: FontStyle.normal),
+                    ),
+                    SizedBox(
+                      height: 0.0,
+                    ),
+                    Text(
+                      "Monday 3, January",
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'Nunito',
+                          color: greyColor,
+                          fontWeight: FontWeight.w600,
+                          fontStyle: FontStyle.normal),
                     ),
                   ],
                 ),
-              )),
-        ],
+              ],
+            ),
+          ),
+        ),
       ),
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -180,214 +162,158 @@ class _HomeScreenState extends State<HomeScreen>
                   Padding(
                     padding:
                         const EdgeInsets.only(top: 30, left: 24, right: 24),
-                    child: Container(
-                      height: 48,
-                      width: MediaQuery.of(context).size.width - 50,
-                      decoration: BoxDecoration(
-                        color: backgroundColor,
-                        //Color(0xffF6F6F6),
-
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                      ),
-                      child: TextField(
-                        readOnly: true,
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => SearchPage()));
-                        },
-                        decoration: InputDecoration(
-                          // contentPadding: EdgeInsets.all(15),
-                          hintText: "Search",
-                          filled: true,
-                          hintStyle: const TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'Nunito',
-                            color: Color(0xff8D9091),
-                            fontWeight: FontWeight.w400,
+                    child: TextField(
+                      readOnly: true,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SearchPage(),
                           ),
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide.none,
-                            borderRadius: BorderRadius.circular((10)),
+                        );
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Search for articles..",
+                        filled: true,
+                        hintStyle: const TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'Nunito',
+                          color: Color(0xff8D9091),
+                          fontWeight: FontWeight.w500,
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                          borderRadius: BorderRadius.circular((10)),
+                        ),
+                        fillColor: Colors.white,
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.only(left: 18.0),
+                          child: TextButton(
+                            child: Icon(
+                              UniconsLine.search,
+                              color: Colors.white,
+                            ),
+                            onPressed: () {},
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all(primaryColor),
+                                shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                fixedSize:
+                                    MaterialStateProperty.all(Size(40, 60))),
                           ),
-                          fillColor: const Color(0xFFF6F6F6),
-                          prefixIcon: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Icon(UniconsLine.search)),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 26,
+
+                  SizedBox(
+                    height: 10,
                   ),
                   //Tab bar
                   Padding(
-                    padding: const EdgeInsets.only(left: 24.0, bottom: 10),
+                    padding: const EdgeInsets.only(left: .0, bottom: 10),
                     child: Container(
                       height: 50,
                       decoration: const BoxDecoration(
-                          color: Color(0xFFF3F3F3),
                           borderRadius: BorderRadius.all(Radius.circular(10))),
-                      child: TabBar(
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        indicator: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: primaryColor),
-                        controller: tabController,
-                        labelColor: Colors.white,
-                        unselectedLabelColor: const Color(0xff8D9091),
-                        isScrollable: true,
-                        tabs: [
-                          Tab(
-                            child: Container(
-
-                                //// height: 38,
-                                decoration: const BoxDecoration(
-                                  //  border: Border.all(color: Color(0xff8D9091)),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                ),
-                                child: const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 20.0),
-                                  child: Center(
-                                    child: Text(
-                                      'Monday ',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          // color: Colors.white,
-                                          //color: Color(0xff8D9091),
-                                          fontFamily: 'Nunito',
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle: FontStyle.normal),
-                                    ),
-                                  ),
-                                )),
-                          ),
-                          Tab(
-                            child: Container(
-
-                                //  height: 38,
-                                decoration: const BoxDecoration(
-                                  // border: Border.all(color: Color(0xff8D9091)),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                ),
-                                child: const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 20.0),
-                                  child: Center(
-                                    child: Text(
-                                      'Tuesday',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontFamily: 'Nunito',
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle: FontStyle.normal),
-                                    ),
-                                  ),
-                                )),
-                          ),
-                          Tab(
-                            child: Container(
-
-                                //height: 38,
-                                decoration: const BoxDecoration(
-                                  // border: Border.all(color: Color(0xff8D9091)),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                ),
-                                child: const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 20.0),
-                                  child: Center(
-                                    child: Text(
-                                      'Wednesday',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          // color: Colors.white,
-                                          //color: Color(0xff8D9091),
-                                          fontFamily: 'Nunito',
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle: FontStyle.normal),
-                                    ),
-                                  ),
-                                )),
-                          ),
-                          Tab(
-                            child: Container(
-
-                                //  height: 38,
-                                decoration: const BoxDecoration(
-                                  //  border: Border.all(color: Color(0xff8D9091)),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8)),
-                                ),
-                                child: const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 20.0),
-                                  child: Center(
-                                    child: Text(
-                                      'Thursday',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontFamily: 'Nunito',
-                                          fontWeight: FontWeight.w500,
-                                          fontStyle: FontStyle.normal),
-                                    ),
-                                  ),
-                                )),
-                          ),
-                          Tab(
-                            child: Container(
-                              // height: 38,
-                              decoration: const BoxDecoration(
-                                //  border: Border.all(color: Color(0xff8D9091)),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 20.0),
-                                child: Center(
-                                  child: Text(
-                                    'Friday',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontFamily: 'Nunito',
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FontStyle.normal),
-                                  ),
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            SizedBox(width: 10),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Center(
+                                child: Text(
+                                  '#Crypto ',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      // color: Colors.white,
+                                      color: greyColor,
+                                      fontFamily: 'Nunito',
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.normal),
                                 ),
                               ),
                             ),
-                          ),
-                          Tab(
-                            child: Container(
-                              // height: 38,
-                              decoration: const BoxDecoration(
-                                //  border: Border.all(color: Color(0xff8D9091)),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8)),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 20.0),
-                                child: Center(
-                                  child: Text(
-                                    'Saturday',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontFamily: 'Nunito',
-                                        fontWeight: FontWeight.w500,
-                                        fontStyle: FontStyle.normal),
-                                  ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Center(
+                                child: Text(
+                                  '#Politics',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: greyColor,
+                                      fontFamily: 'Nunito',
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.normal),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Center(
+                                child: Text(
+                                  '#Sports',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      // color: Colors.white,
+                                      color: greyColor,
+                                      fontFamily: 'Nunito',
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.normal),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Center(
+                                child: Text(
+                                  '#Technology',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: greyColor,
+                                      fontFamily: 'Nunito',
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.normal),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Center(
+                                child: Text(
+                                  '#Science',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: greyColor,
+                                      fontFamily: 'Nunito',
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.normal),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              child: Center(
+                                child: Text(
+                                  '#Finance',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: greyColor,
+                                      fontFamily: 'Nunito',
+                                      fontWeight: FontWeight.w500,
+                                      fontStyle: FontStyle.normal),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -418,9 +344,50 @@ class _HomeScreenState extends State<HomeScreen>
                       // if we got our data
                     } else if (snap.hasData) {
                       // Extracting data from snap object
-                      // menu = snap.data! as List<List<Product>>;
 
-                      return Text('Hello Start Now');
+                      news = snap.data! as List<News>;
+                      ref.read(NewsState.provider.notifier).setNews(news);
+                      return ListView(
+                        physics: NeverScrollableScrollPhysics(),
+                        children: [
+                          Container(
+                            height: 280,
+                            child: ListView(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0, vertical: 2.0),
+                              children: news.map((element) {
+                                return BuildNews(
+                                  news: element,
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 10.0),
+                            child: Text('Shorts For You'),
+                          ),
+                          Container(
+                            height: 110,
+                            child: ListView(
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0, vertical: 2.0),
+                              children: news.reversed.map((element) {
+                                return BuildNewsShorts(
+                                  news: element,
+                                );
+                              }).toList() as List<Widget>,
+                            ),
+                          ),
+                        ],
+                      );
                     }
 
                     return Container();
@@ -521,14 +488,14 @@ class _HomeScreenState extends State<HomeScreen>
     //           shrinkWrap: true,
     //           controller: _scrollController,
     //           itemBuilder: (context, index) {
-    //             final Product myproduct = product[0][index];
-    //             return Text(myproduct.name);
+    //             final Product mynews = news[0][index];
+    //             return Text(mynews.name);
     //             // return ListTile(
-    //             //   leading: Text(myproduct.name),
+    //             //   leading: Text(mynews.name),
     //             // );
-    //             // Text(myproduct.name);
+    //             // Text(mynews.name);
     //           },
-    //           itemCount: product[0].length,
+    //           itemCount: news[0].length,
     //         );
     //       }
     //       return Container(
@@ -546,78 +513,286 @@ class _HomeScreenState extends State<HomeScreen>
   }
 }
 
-// class searchbar extends SearchDelegate {
+//Order list section for drinks, special and Sandwiches and noodles
+class BuildNews extends StatelessWidget {
+  News news;
 
-//   @override
-//   // TODO: implement keyboardType
-//   TextInputType? get keyboardType => super.keyboardType;
+  BuildNews({
+    Key? key,
+    required this.news,
+  }) : super(key: key);
 
-//   @override
-//   // TODO: implement searchFieldStyle
-//   TextStyle? get searchFieldStyle => TextStyle(backgroundColor: Colors.black);
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NewsDetails(
+              news: news,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(left: 8, right: 2),
+        width: 230,
+        // height: 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.grey.withOpacity(0.5),
+          //     spreadRadius: 0,
+          //     blurRadius: 1,
+          //   ),
+          // ],
+          color: Colors.white,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              height: 150,
+              margin: EdgeInsets.all(10),
+              width: double.infinity,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(
+                  Radius.circular(10),
+                ),
+                child: news.urlToImage == ""
+                    ? ExtendedImage.network(
+                        '',
+                        fit: BoxFit.cover,
+                        cache: true,
+                      )
+                    : ExtendedImage.network(
+                        news.urlToImage,
+                        fit: BoxFit.cover,
+                        cache: true,
+                      ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 10.0,
+                right: 10,
+                top: 8,
+                bottom: 6,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    child: Text(
+                      news.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w600,
+                          fontStyle: FontStyle.normal),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  Row(
+                    children: [
+                      Center(
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/user.png',
+                            height: 30,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      SizedBox(
+                        width: 100,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              (news.author),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black,
+                                  fontFamily: 'Nunito',
+                                  fontWeight: FontWeight.w400,
+                                  fontStyle: FontStyle.normal),
+                            ),
+                            Text(
+                              '${news.publishedAt.day}/ ${news.publishedAt.month}/ ${news.publishedAt.year}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey,
+                                  fontFamily: 'Nunito',
+                                  fontWeight: FontWeight.w400,
+                                  fontStyle: FontStyle.normal),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(
+                        width: 20,
+                      ),
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Icon(
+                            UniconsLine.folder_open,
+                            color: Colors.white,
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: primaryColor.withOpacity(0.12),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-//   @override
-//   List<Widget>? buildActions(BuildContext context) {
-//     return [
-//       Text(
-//         'Cancel',
-//         style: TextStyle(color: Colors.black),
-//       )
-//     ];
-//   }
+class BuildNewsShorts extends StatelessWidget {
+  News news;
 
-//   @override
-//   Widget? buildLeading(BuildContext context) {
-//     return Container();
-//     // TODO: implement buildLeading
-//     //throw UnimplementedError();
-//   }
+  BuildNewsShorts({
+    Key? key,
+    required this.news,
+  }) : super(key: key);
 
-//   @override
-//   Widget buildResults(BuildContext context) {
-//     // TODO: implement buildResults
-//     return Container();
-//     // throw UnimplementedError();
-//   }
-
-//   @override
-//   Widget buildSuggestions(BuildContext context) {
-//     // TODO: implement buildSuggestions
-//     return Container();
-//     // throw UnimplementedError();
-//   }
-// }
-
-// class TabWidget extends StatelessWidget {
-//   const TabWidget({
-//     Key ? key, this.day,
-
-//   }) : super(key: key);
-
-//   final String day;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Tab(
-//       child: Container(
-//
-//           height: 38,
-//           decoration: BoxDecoration(
-//             border: Border.all(color: Color(0xff8D9091)),
-//             borderRadius: BorderRadius.all(Radius.circular(8)),
-//           ),
-//           child: Center(
-//             child: Text(
-//               day,
-//               style: TextStyle(
-//                   fontSize: 14,
-//                   // color: Colors.white,
-//                   //color: Color(0xff8D9091),
-//                   fontFamily: 'Gordita',
-//                   fontWeight: FontWeight.w500,
-//                   fontStyle: FontStyle.normal),
-//             ),
-//           )),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NewsDetails(
+              news: news,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(left: 8, right: 2),
+        width: 250,
+        // height: 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.grey.withOpacity(0.5),
+          //     spreadRadius: 0,
+          //     blurRadius: 1,
+          //   ),
+          // ],
+          color: Colors.white,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                height: double.maxFinite,
+                width: 80,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(
+                    Radius.circular(10),
+                  ),
+                  child: news.urlToImage == ""
+                      ? ExtendedImage.network(
+                          '',
+                          fit: BoxFit.cover,
+                          cache: true,
+                        )
+                      : ExtendedImage.network(
+                          news.urlToImage,
+                          fit: BoxFit.cover,
+                          cache: true,
+                        ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 10.0,
+                right: 10,
+                top: 8,
+                bottom: 6,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: 120,
+                    child: Text(
+                      news.title,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'Nunito',
+                          fontWeight: FontWeight.w600,
+                          fontStyle: FontStyle.normal),
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  Row(
+                    children: [
+                      Icon(
+                        UniconsLine.eye,
+                        color: greyColor,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        //  'NGN 800',
+                        ('40,6537'),
+                        style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                            fontFamily: 'Nunito',
+                            fontWeight: FontWeight.w400,
+                            fontStyle: FontStyle.normal),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

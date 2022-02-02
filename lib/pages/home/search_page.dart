@@ -1,4 +1,5 @@
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:newsapp/models/news.dart';
 import 'package:newsapp/notifiers/auth_notifier.dart';
 
@@ -11,74 +12,66 @@ import 'package:riverpod/riverpod.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:unicons/unicons.dart';
 
-class SearchPage extends StatefulWidget {
+class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
 
   @override
   _SearchPageState createState() => _SearchPageState();
 }
 
-class _SearchPageState extends State<SearchPage>
+class _SearchPageState extends ConsumerState<SearchPage>
     with SingleTickerProviderStateMixin {
-  late int day;
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   TextEditingController search_controller = new TextEditingController();
 
   String searchval = "";
+  List<News> searchnews = [];
+  List<News> allnews = [];
   late dynamic myfuture;
 
   var focusNode = FocusNode();
 
   @override
   void initState() {
-    day = DateTime.now().weekday;
-    print("Day : $day");
-    // Adjust by subtracting 1 to compensate for Sunday
-    day -= 1;
-
-    // When day does not exist in the tabs
-    if (day > lengthTab - 1) day = 0;
-
-    // Change to a Monday if day is Sunday
-    if (day < 0) day = 0;
-
-    tabController = TabController(
-      length: lengthTab,
-      vsync: this,
-    );
-
-    tabController.index = day;
-
+    // "ref" can be used in all life-cycles of a StatefulWidget
+    final newsList = ref.read(NewsState.provider);
+    setState(() {
+      searchnews = newsList;
+      allnews = newsList;
+    });
     // myfuture = search('');
 
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) {
-      if (focusNode.canRequestFocus) {
-        FocusScope.of(context).requestFocus(focusNode);
-      }
-    });
+    WidgetsBinding.instance?.addPostFrameCallback(
+      (timeStamp) {
+        if (focusNode.canRequestFocus) {
+          FocusScope.of(context).requestFocus(focusNode);
+        }
+      },
+    );
   }
 
-  // Future<List<List<Product>>> search(String val) async {
-  //   val = val.toLowerCase();
-  //   searchmenu.clear();
-  //   productNotifier.productslist.forEach((element) {
-  //     List<Product> news = [];
+  Future<List<News>> search(String val) async {
+    val = val.toLowerCase();
+    setState(() {
+      searchnews = [];
+    });
 
-  //     element.forEach((elements) {
-  //       if (elements.name.toLowerCase().contains(val)) {
-  //         news.add(elements);
-  //       }
-  //     });
-  //     print(searchmenu.length);
-  //     setState(() {
-  //       searchmenu.add(news);
-  //     });
-  //     // searchmenu.add(news);
-  //   });
+    allnews.forEach((element) {
+      List<News> news = [];
 
-  //   return searchmenu;
-  // }
+      if (element.title.toLowerCase().contains(val)) {
+        print(val);
+        setState(() {
+          searchnews.add(element);
+        });
+      }
+
+      print(searchnews.length);
+    });
+
+    return searchnews;
+  }
 
   @override
   Future<void> didChangeDependencies() async {
@@ -91,448 +84,145 @@ class _SearchPageState extends State<SearchPage>
     super.dispose();
   }
 
-  final int lengthTab = 6;
-  late TabController tabController;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         key: _scaffoldKey,
         backgroundColor: backgroundColor,
-        //App Bar Data
-        // appBar: AppBar(
-        //   iconTheme: const IconThemeData(color: Colors.black),
-        //   backgroundColor: Colors.white,
-        //   elevation: 0,
-        //   titleSpacing: 23,
-        //   // leading: GestureDetector(
-        //   //   onTap: () {
-        //   //     _scaffoldKey.currentState!.openDrawer();
-        //   //   },
-        //   //   child: Image.asset(
-        //   //     'assets/images/sort.png',
-        //   //   ),
-        //   // ),
-        // ),
+        appBar: AppBar(
+          iconTheme: const IconThemeData(color: Colors.black),
+          backgroundColor: Colors.white,
+          elevation: 0,
+          titleSpacing: 23,
+          // leading: GestureDetector(
+          //   onTap: () {
+          //     _scaffoldKey.currentState!.openDrawer();
+          //   },
+          //   child: Image.asset(
+          //     'assets/images/sort.png',
+          //   ),
+          // ),
+        ),
         body: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              SliverToBoxAdapter(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                  ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(top: 60, left: 24, right: 24),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              height: 48,
-                              width: MediaQuery.of(context).size.width - 130,
-                              decoration: BoxDecoration(
-                                color: backgroundColor,
-                                //Color(0xffF6F6F6),
-
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(10)),
-                              ),
-                              child: TextField(
+            headerSliverBuilder:
+                (BuildContext context, bool innerBoxIsScrolled) {
+              return <Widget>[
+                SliverToBoxAdapter(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              top: 10, left: 24, right: 24),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              TextField(
                                 focusNode: focusNode,
                                 controller: search_controller,
                                 onSubmitted: (val) {},
-                                onChanged: (val) {
+                                onChanged: (val) async {
                                   setState(() {
                                     searchval = val;
                                   });
-                                  // search(val);
+                                  await search(val);
                                 },
                                 decoration: InputDecoration(
-                                  // contentPadding: EdgeInsets.all(15),
-
-                                  hintText: "Search",
+                                  hintText: "Search for articles..",
                                   filled: true,
                                   hintStyle: const TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 15,
                                     fontFamily: 'Nunito',
                                     color: Color(0xff8D9091),
-                                    fontWeight: FontWeight.w400,
+                                    fontWeight: FontWeight.w500,
                                   ),
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide.none,
                                     borderRadius: BorderRadius.circular((10)),
                                   ),
-                                  fillColor: const Color(0xFFF6F6F6),
-                                  prefixIcon: Padding(
-                                      padding: const EdgeInsets.all(12.0),
-                                      child: Icon(UniconsSolid.airplay)),
+                                  fillColor: Colors.white,
+                                  suffixIcon: Padding(
+                                    padding: const EdgeInsets.only(left: 18.0),
+                                    child: TextButton(
+                                      child: Icon(
+                                        UniconsLine.search,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: () {},
+                                      style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  primaryColor),
+                                          shape: MaterialStateProperty.all(
+                                            RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          fixedSize: MaterialStateProperty.all(
+                                              Size(40, 60))),
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                            TextButton(
-                              child: Text(
-                                "Cancel",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'Nunito',
-                                    color: primaryColor,
-                                    fontWeight: FontWeight.w700,
-                                    fontStyle: FontStyle.normal),
-                              ),
-                              style: ButtonStyle(
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  backgroundColor: MaterialStateProperty.all(
-                                    Colors.transparent,
-                                  ),
-                                  padding: MaterialStateProperty.all(
-                                      EdgeInsets.all(0.0)),
-                                  textStyle: MaterialStateProperty.all(
-                                    const TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  fixedSize:
-                                      MaterialStateProperty.all(Size(60, 20))),
-                              onPressed: () {
-                                // final form = formKey.currentState;
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      //Tab bar
-                      TabBar(
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        controller: tabController,
-                        labelColor: primaryColor,
-                        indicatorColor: primaryColor,
-                        indicatorPadding: const EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 0),
-                        labelPadding: const EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 0),
-                        unselectedLabelColor: const Color(0xff8D9091),
-                        isScrollable: true,
-                        padding: EdgeInsets.only(left: 10, bottom: 0),
-                        tabs: [
-                          Tab(
-                            child: Text(
-                              'Monday ',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  // color: Colors.white,
-                                  //color: Color(0xff8D9091),
-                                  fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.w500,
-                                  fontStyle: FontStyle.normal),
-                            ),
-                          ),
-                          Tab(
-                            child: Center(
-                              child: Text(
-                                'Tuesday',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontFamily: 'Nunito',
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FontStyle.normal),
-                              ),
-                            ),
-                          ),
-                          Tab(
-                            child: Center(
-                              child: Text(
-                                'Wednesday',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    // color: Colors.white,
-                                    //color: Color(0xff8D9091),
-                                    fontFamily: 'Nunito',
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FontStyle.normal),
-                              ),
-                            ),
-                          ),
-                          Tab(
-                            child: Center(
-                              child: Text(
-                                'Thursday',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontFamily: 'Nunito',
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FontStyle.normal),
-                              ),
-                            ),
-                          ),
-                          Tab(
-                            child: Center(
-                              child: Text(
-                                'Friday',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontFamily: 'Nunito',
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FontStyle.normal),
-                              ),
-                            ),
-                          ),
-                          Tab(
-                            child: Center(
-                              child: Text(
-                                'Saturday',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontFamily: 'Nunito',
-                                    fontWeight: FontWeight.w500,
-                                    fontStyle: FontStyle.normal),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        //Tab bar
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ];
-          },
-          body: Column(
-            children: [
-              // const SizedBox(height: 20),
-              // Expanded(
-              //   child: searchmenu.isNotEmpty
-              //       ? TabBarView(
-              //           controller: tabController,
-              //           children: [
-              //             searchmenu[0].length > 0
-              //                 ? SearchRes(
-              //                     pros: searchmenu[0],
-              //                     day: 0,
-              //                   )
-              //                 : Center(
-              //                     child: Column(
-              //                       mainAxisAlignment: MainAxisAlignment.center,
-              //                       children: [
-              //                         Text(
-              //                           "No results found ",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             fontFamily: 'Nunito',
-              //                             fontSize: 18,
-              //                             fontWeight: FontWeight.w600,
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 10,
-              //                         ),
-              //                         Text(
-              //                           "There were no items \n matching your search for  '$searchval'",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             height: 1.3,
-              //                             fontFamily: 'Nunito',
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 100,
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ),
-              //             searchmenu[1].length > 0
-              //                 ? SearchRes(
-              //                     pros: searchmenu[1],
-              //                     day: 1,
-              //                   )
-              //                 : Center(
-              //                     child: Column(
-              //                       mainAxisAlignment: MainAxisAlignment.center,
-              //                       children: [
-              //                         Text(
-              //                           "No results found ",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             fontFamily: 'Nunito',
-              //                             fontSize: 18,
-              //                             fontWeight: FontWeight.w600,
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 10,
-              //                         ),
-              //                         Text(
-              //                           "There were no items \n matching your search for  '$searchval'",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             height: 1.3,
-              //                             fontFamily: 'Nunito',
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 100,
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ),
-              //             searchmenu[2].length > 0
-              //                 ? SearchRes(
-              //                     pros: searchmenu[2],
-              //                     day: 2,
-              //                   )
-              //                 : Center(
-              //                     child: Column(
-              //                       mainAxisAlignment: MainAxisAlignment.center,
-              //                       children: [
-              //                         Text(
-              //                           "No results found ",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             fontFamily: 'Nunito',
-              //                             fontSize: 18,
-              //                             fontWeight: FontWeight.w600,
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 10,
-              //                         ),
-              //                         Text(
-              //                           "There were no items \n matching your search for  '$searchval'",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             height: 1.3,
-              //                             fontFamily: 'Nunito',
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 100,
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ),
-              //             searchmenu[3].length > 0
-              //                 ? SearchRes(
-              //                     pros: searchmenu[3],
-              //                     day: 3,
-              //                   )
-              //                 : Center(
-              //                     child: Column(
-              //                       mainAxisAlignment: MainAxisAlignment.center,
-              //                       children: [
-              //                         Text(
-              //                           "No results found ",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             fontFamily: 'Nunito',
-              //                             fontSize: 18,
-              //                             fontWeight: FontWeight.w600,
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 10,
-              //                         ),
-              //                         Text(
-              //                           "There were no items \n matching your search for  '$searchval'",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             height: 1.3,
-              //                             fontFamily: 'Nunito',
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 100,
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ),
-              //             searchmenu[4].length > 0
-              //                 ? SearchRes(
-              //                     pros: searchmenu[4],
-              //                     day: 4,
-              //                   )
-              //                 : Center(
-              //                     child: Column(
-              //                       mainAxisAlignment: MainAxisAlignment.center,
-              //                       children: [
-              //                         Text(
-              //                           "No results found ",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             fontFamily: 'Nunito',
-              //                             fontSize: 18,
-              //                             fontWeight: FontWeight.w600,
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 10,
-              //                         ),
-              //                         Text(
-              //                           "There were no items \n matching your search for  '$searchval'",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             height: 1.3,
-              //                             fontFamily: 'Nunito',
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 100,
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ),
-              //             searchmenu[5].length > 0
-              //                 ? SearchRes(
-              //                     pros: searchmenu[5],
-              //                     day: 5,
-              //                   )
-              //                 : Center(
-              //                     child: Column(
-              //                       mainAxisAlignment: MainAxisAlignment.center,
-              //                       children: [
-              //                         Text(
-              //                           "No results found ",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             fontFamily: 'Nunito',
-              //                             fontSize: 18,
-              //                             fontWeight: FontWeight.w600,
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 10,
-              //                         ),
-              //                         Text(
-              //                           "There were no items \n matching your search for  '$searchval'",
-              //                           textAlign: TextAlign.center,
-              //                           style: TextStyle(
-              //                             height: 1.3,
-              //                             fontFamily: 'Nunito',
-              //                           ),
-              //                         ),
-              //                         SizedBox(
-              //                           height: 100,
-              //                         ),
-              //                       ],
-              //                     ),
-              //                   ),
-              //           ],
-              //         )
-              //       : Container(),
-              // ),
-              Text('Hello'),
-            ],
-          ),
-        )
+              ];
+            },
+            body: Column(
+              children: [
+                // const SizedBox(height: 20),
+                Expanded(
+                  child: searchnews.isNotEmpty
+                      ? SearchRes(
+                          pros: searchnews,
+                          day: 0,
+                        )
+                      : Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "No results found ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                "There were no items \n matching your search for  '$searchval'",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  height: 1.3,
+                                  fontFamily: 'Nunito',
+                                ),
+                              ),
+                              SizedBox(
+                                height: 100,
+                              ),
+                            ],
+                          ),
+                        ),
+                ),
+              ],
+            ))
         //SignChildScro
         //     Container(
         //         child: FutureBuilder(
@@ -615,17 +305,16 @@ class SearchRes extends StatelessWidget {
                   padding: const EdgeInsets.all(15.0),
                   child: ClipRRect(
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
-                    child: pros[index].photo == ""
+                    child: pros[index].urlToImage == ""
                         ? ExtendedImage.network(
-                            'https://order-api.newsapp.ng/api/photo/asun-spaghetti-plantain-medium-chicken59.jpg',
+                            '',
                             fit: BoxFit.cover,
                             cache: true,
                             width: 90,
                             height: 90,
                           )
                         : ExtendedImage.network(
-                            'https://order-api.newsapp.ng/api/photo/' +
-                                pros[index].photo,
+                            pros[index].urlToImage,
                             fit: BoxFit.cover,
                             cache: true,
                             width: 90,
@@ -649,32 +338,31 @@ class SearchRes extends StatelessWidget {
                           SizedBox(
                             width: MediaQuery.of(context).size.width * 0.5,
                             child: Text(
-                              pros[index].name,
+                              pros[index].title,
                               maxLines: 2,
                               style: const TextStyle(
                                   fontSize: 14,
                                   overflow: TextOverflow.ellipsis,
                                   fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w500,
                                   fontStyle: FontStyle.normal),
                             ),
                           ),
                           const SizedBox(
                             height: 20,
                           ),
-                          Row(
-                            children: [
-                              Text(
-                                //  'NGN 800',
-                                ("NGN " + pros[index].price.toString()),
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontFamily: 'Nunito',
-                                    color: primaryColor,
-                                    fontWeight: FontWeight.w700,
-                                    fontStyle: FontStyle.normal),
-                              ),
-                            ],
+                          SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            child: Text(
+                              //  'NGN 800',
+                              ('By ' + pros[index].author.toString()),
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontFamily: 'Nunito',
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.w700,
+                                  fontStyle: FontStyle.normal),
+                            ),
                           )
                         ],
                       ),

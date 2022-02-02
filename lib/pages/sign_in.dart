@@ -18,7 +18,6 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   final formKey = GlobalKey<FormState>();
   bool hidePassword = true;
-  late AuthNotifier authNotifier;
 
   String email = "";
   String password = "";
@@ -47,12 +46,14 @@ class _SignInState extends State<SignIn> {
       RequestResult result = await loginUser(email, password);
 
       if (result.ok) {
-        // Navigator.pushNamedAndRemoveUntil(
-        //   context,
-        //   "/applayout",
-        //   (route) => false,
-        // );
-        // Navigator.pushReplacementNamed(context, ('/checkout'));
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          "/applayout",
+          (route) => false,
+        );
+        setState(() {
+          loading = false;
+        });
       } else {
         setState(() {
           error = result.data;
@@ -210,7 +211,7 @@ class _SignInState extends State<SignIn> {
                         hintStyle: TextStyle(
                           fontSize: 14,
                           fontFamily: 'Nunito',
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                           fontStyle: FontStyle.normal,
                           color: Color(0xff8D9091),
                         ),
@@ -279,7 +280,7 @@ class _SignInState extends State<SignIn> {
                         hintStyle: TextStyle(
                           fontSize: 14,
                           fontFamily: 'Nunito',
-                          fontWeight: FontWeight.w400,
+                          fontWeight: FontWeight.w500,
                           fontStyle: FontStyle.normal,
                           color: Color(0xff8D9091),
                         ),
@@ -403,8 +404,6 @@ class _SignInState extends State<SignIn> {
                               error = '';
                             });
                             FocusManager.instance.primaryFocus?.unfocus();
-                            Navigator.pushNamedAndRemoveUntil(
-                                context, '/applayout', (route) => false);
 
                             if (formKey.currentState!.validate()) {
                               signIn(email, password);
@@ -428,26 +427,26 @@ class _SignInState extends State<SignIn> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const Text(
-                            "Already have an account? ",
+                            "Don't have an account? ",
                             style: TextStyle(
                                 fontSize: 16,
                                 color: Color(0xff8D9091),
                                 fontFamily: 'Nunito',
-                                fontWeight: FontWeight.w400,
+                                fontWeight: FontWeight.w500,
                                 fontStyle: FontStyle.normal),
                           ),
                           SizedBox(height: 5),
                           InkWell(
                             onTap: () {
-                              Navigator.pushNamed(context, '/sign_in');
+                              Navigator.pushNamed(context, '/sign_up');
                             },
                             child: Text(
-                              'Log in',
+                              'Sign Up',
                               style: TextStyle(
                                   fontSize: 16,
                                   color: primaryColor,
                                   fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w500,
                                   fontStyle: FontStyle.normal),
                             ),
                           )

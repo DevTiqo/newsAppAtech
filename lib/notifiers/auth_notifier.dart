@@ -1,47 +1,17 @@
 import 'package:flutter/widgets.dart';
-import 'package:newsapp/models/user.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-enum Status {
-  NotLoggedIn,
-  NotRegistered,
-  LoggedIn,
-  Registered,
-  Authenticating,
-  Registering,
-  LoggedOut
-}
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:newsapp/services/auth_service.dart';
 
-class AuthNotifier extends ChangeNotifier {
-  Status _loggedInStatus = Status.NotLoggedIn;
-  Status _registeredInStatus = Status.NotRegistered;
+final firebaseAuthProvider = Provider<FirebaseAuth>((ref) {
+  return FirebaseAuth.instance;
+});
 
-  User _user = User(
-    id: 0,
-    name: "",
-    email: "",
-    phone: "",
-  );
+final authServicesProvider = Provider<AuthenticationService>((ref) {
+  return AuthenticationService(ref.read(firebaseAuthProvider));
+});
 
-  User get user => _user;
-
-  Status get loggedInStatus => _loggedInStatus;
-  Status get registerdInStatus => _registeredInStatus;
-
-  set loggedInStatus(Status value) {
-    _loggedInStatus = value;
-  }
-
-  set registeredInstatus(Status value) {
-    registeredInstatus = value;
-  }
-
-  void setUser(User user) {
-    _user = user;
-    notifyListeners();
-  }
-
-  void removeUser() {
-    _user = User(name: "", id: 0, phone: "", email: "");
-    notifyListeners();
-  }
-}
+final authStateProvider = StreamProvider<User?>((ref) {
+  return ref.watch(authServicesProvider).authStateChange;
+});

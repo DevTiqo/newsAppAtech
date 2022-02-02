@@ -19,10 +19,13 @@ class _OnboardingState extends State<Onboarding> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Image.asset(
-              //   'assets/images/Group.png',
-              //   height: size.height * 0.53,
-              // ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Image.asset(
+                  'assets/images/onboarding.png',
+                  height: size.height * 0.48,
+                ),
+              ),
 
               //Ther was an error loading this in SVG
 
@@ -34,6 +37,9 @@ class _OnboardingState extends State<Onboarding> {
               //   //     ? light.scaffoldBackgroundColor
               //   //     : primaryColor,
               // ),
+              SizedBox(
+                height: 20,
+              ),
 
               RichText(
                 textAlign: TextAlign.center,
