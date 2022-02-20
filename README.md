@@ -1,2 +1,7 @@
 # newsAppAtech
-A news app for an interview
+A news app 
+
+- firebase 
+- flutter
+- UI from dribbble.com
+-
