@@ -57,7 +57,7 @@ class _MyAppState extends State<MyApp> {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'NewsAppYsaavd',
+      title: 'News',
       theme: light,
       home: AuthenticationWrapper(),
       routes: {
