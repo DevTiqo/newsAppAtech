@@ -629,7 +629,7 @@ class BuildNews extends StatelessWidget {
                                   fontSize: 13,
                                   color: Colors.black,
                                   fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w700,
                                   fontStyle: FontStyle.normal),
                             ),
                             Text(
@@ -640,7 +640,7 @@ class BuildNews extends StatelessWidget {
                                   fontSize: 8,
                                   color: Colors.grey,
                                   fontFamily: 'Nunito',
-                                  fontWeight: FontWeight.w400,
+                                  fontWeight: FontWeight.w600,
                                   fontStyle: FontStyle.normal),
                             ),
                           ],
