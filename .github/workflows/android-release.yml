@@ -36,7 +36,7 @@ jobs:
         name: my-artifact
         path: package${{github.run_number }}.zip
 
-  dropbox:
+  firebase:
     needs: [build]
     runs-on: ubuntu-18.04
     steps:
@@ -44,19 +44,19 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: my-artifact
-      - name: Dropbox
-        uses: aTable/deploy-to-dropbox@v1.0.7
+      - name: upload artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1.2.1
         with:
-          DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-          DROPBOX_DESTINATION_PATH_PREFIX: "/QATests/"
-          GLOB: package${{github.run_number }}.zip
-          DEBUG: false
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: testers
+          file: build/app/outputs/flutter-apk/app-x86_64-release.apk
           
   sendemails:
-    needs: [dropbox]
+    needs: [firebase]
     runs-on: ubuntu-18.04
     steps:
-     - name: Send mailz
+     - name: Send mails
        uses: dawidd6/action-send-mail@v3
        with:
         # Required mail server address:
