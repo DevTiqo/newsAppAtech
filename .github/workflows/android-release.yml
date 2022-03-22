@@ -45,7 +45,6 @@ jobs:
 
 
   sendemails:
-    needs: [firebase]
     runs-on: ubuntu-18.04
     steps:
      - name: Send mails
