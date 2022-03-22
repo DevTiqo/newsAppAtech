@@ -35,25 +35,16 @@ jobs:
       with:
         name: my-artifact
         path: package${{github.run_number }}.zip
+    - name: upload artifact to Firebase App Distribution
+      uses: wzieba/Firebase-Distribution-Github-Action@v1.2.1
+      with:
+        appId: ${{secrets.FIREBASE_APP_ID}}
+        token: ${{secrets.FIREBASE_TOKEN}}
+        groups: testers
+        file: "build/app/outputs/flutter-apk/app-x86_64-release.apk"
 
-  firebase:
-    needs: [build]
-    runs-on: ubuntu-18.04
-    steps:
-      - name: Upload
-        uses: actions/download-artifact@v3
-        with:
-          name: my-artifact
-      - name: upload artifact to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1.2.1
-        with:
-          appId: ${{secrets.FIREBASE_APP_ID}}
-          token: ${{secrets.FIREBASE_TOKEN}}
-          groups: testers
-          file: build/app/outputs/flutter-apk/app-x86_64-release.apk
-          
+
   sendemails:
-    needs: [firebase]
     runs-on: ubuntu-18.04
     steps:
      - name: Send mails
