@@ -47,7 +47,7 @@ jobs:
 #   sendemails:
 #     runs-on: ubuntu-18.04
 #     steps:
-#      - name: Send mails
+#      - name: Send mailz
 #        uses: dawidd6/action-send-mail@v3
 #        with:
 #         # Required mail server address:
