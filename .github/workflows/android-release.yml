@@ -6,7 +6,7 @@ on:
     
 jobs:
   build:
-    name: Build APK
+    name: Build APK and Distribute with Firebase
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -35,7 +35,7 @@ jobs:
 #       with:
 #         name: my-artifact
 #         path: package${{github.run_number }}.zip
-    - name: upload artifact to Firebase App Distribution
+    - name: upload artifact to Firebase App Distribution Now
       uses: wzieba/Firebase-Distribution-Github-Action@v1.2.1
       with:
         appId: ${{secrets.FIREBASE_APP_ID}}
